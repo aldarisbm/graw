@@ -49,7 +49,7 @@ func (a *account) Reply(parentName, text string) error {
 }
 
 func (a *account) GetReply(parentName, text string) (Submission, error) {
-	return a.r.get_sow(
+	return a.r.getSow(
 		"/api/comment", map[string]string{
 			"thing_id": parentName,
 			"text":     text,
@@ -79,7 +79,7 @@ func (a *account) PostSelf(subreddit, title, text string) error {
 }
 
 func (a *account) GetPostSelf(subreddit, title, text string) (Submission, error) {
-	return a.r.get_sow(
+	return a.r.getSow(
 		"/api/submit", map[string]string{
 			"sr":    subreddit,
 			"kind":  "self",
@@ -101,7 +101,7 @@ func (a *account) PostLink(subreddit, title, url string) error {
 }
 
 func (a *account) GetPostLink(subreddit, title, url string) (Submission, error) {
-	return a.r.get_sow(
+	return a.r.getSow(
 		"/api/submit", map[string]string{
 			"sr":    subreddit,
 			"kind":  "link",
