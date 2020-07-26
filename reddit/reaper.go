@@ -1,6 +1,7 @@
 package reddit
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -169,6 +170,7 @@ func (r *reaperImpl) getHeaders(values map[string]string) map[string][]string {
 	headers := make(map[string][]string)
 	b, _ := io.Copy(ioutil.Discard, strings.NewReader(r.formatValues(values).Encode()))
 
+	fmt.Println("LOL")
 	headers["Content-Type"] = []string{"application/x-www-form-urlencoded"}
 	headers["Content-Length"] = []string{strconv.Itoa(int(b))}
 
