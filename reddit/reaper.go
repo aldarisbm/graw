@@ -165,8 +165,8 @@ func (r *reaperImpl) formatValues(values map[string]string) url.Values {
 	return formattedValues
 }
 
-func (r *reaperImpl) getHeaders(values map[string]string) (headers map[string][]string) {
-
+func (r *reaperImpl) getHeaders(values map[string]string) map[string][]string {
+	headers := make(map[string][]string)
 	b, _ := io.Copy(ioutil.Discard, strings.NewReader(r.formatValues(values).Encode()))
 
 	headers["Content-Type"] = []string{"application/x-www-form-urlencoded"}
