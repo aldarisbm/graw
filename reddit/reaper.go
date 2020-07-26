@@ -167,8 +167,10 @@ func (r *reaperImpl) formatValues(values map[string]string) url.Values {
 
 func (r *reaperImpl) getHeaders(values map[string]string) (headers map[string][]string) {
 
+	b, _ := io.Copy(ioutil.Discard, strings.NewReader(r.formatValues(values).Encode()))
+
 	headers["Content-Type"] = []string{"application/x-www-form-urlencoded"}
-	headers["Content-Length"] = []string{strconv.Itoa(len(r.formatValues(values).Encode()))}
+	headers["Content-Length"] = []string{strconv.Itoa(int(b))}
 
 	return headers
 }
