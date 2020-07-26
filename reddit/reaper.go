@@ -1,8 +1,11 @@
 package reddit
 
 import (
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -13,9 +16,6 @@ var (
 	scheme = map[bool]string{
 		true:  "https",
 		false: "http",
-	}
-	formEncoding = map[string][]string{
-		"content-type": {"application/x-www-form-urlencoded"},
 	}
 )
 
@@ -90,9 +90,10 @@ func (r *reaperImpl) sow(path string, values map[string]string) error {
 	_, err := r.cli.Do(
 		&http.Request{
 			Method: "POST",
-			Header: formEncoding,
+			Header: r.getHeaders(values),
 			Host:   r.hostname,
-			URL:    r.url(path, values),
+			URL:    r.postURL(path),
+			Body:   r.getBody(values),
 		},
 	)
 
@@ -105,9 +106,10 @@ func (r *reaperImpl) getSow(path string, values map[string]string) (Submission, 
 	resp, err := r.cli.Do(
 		&http.Request{
 			Method: "POST",
-			Header: formEncoding,
+			Header: r.getHeaders(values),
 			Host:   r.hostname,
-			URL:    r.url(path, values),
+			URL:    r.postURL(path),
+			Body:   r.getBody(values),
 		},
 	)
 
@@ -137,6 +139,14 @@ func (r *reaperImpl) url(path string, values map[string]string) *url.URL {
 	}
 }
 
+func (r *reaperImpl) postURL(path string) *url.URL {
+	return &url.URL{
+		Scheme: r.scheme,
+		Host:   r.hostname,
+		Path:   path,
+	}
+}
+
 func (r *reaperImpl) path(p string, suff string) string {
 	if strings.HasSuffix(p, suff) {
 		return p
@@ -153,4 +163,16 @@ func (r *reaperImpl) formatValues(values map[string]string) url.Values {
 	}
 
 	return formattedValues
+}
+
+func (r *reaperImpl) getHeaders(values map[string]string) (headers map[string][]string) {
+
+	headers["Content-Type"] = []string{"application/x-www-form-urlencoded"}
+	headers["Content-Length"] = []string{strconv.Itoa(len(r.formatValues(values).Encode()))}
+
+	return headers
+}
+
+func (r *reaperImpl) getBody(values map[string]string) io.ReadCloser {
+	return ioutil.NopCloser(strings.NewReader(r.formatValues(values).Encode()))
 }
